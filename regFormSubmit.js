@@ -1,0 +1,5 @@
+function regFormSubmitActions()
+{
+  registerParticipant();
+  updateCentreRegForm();
+}
