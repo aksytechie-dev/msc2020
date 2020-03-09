@@ -5,8 +5,8 @@
 4. First Meal Type
 */
 
-function insertVal() {
-    var master = SpreadsheetApp.openByUrl('https://docs.google.com/spreadsheets/d/1FAb0GdFmz3oYgyCI70sHilRAzrAhD3FCD0COxbpTTPY/edit');
+function insertVal(sheetUrl) {
+    var master = SpreadsheetApp.openByUrl(sheetUrl);
     var list = master.getSheetByName("List");
     var fmval = master.getSheetByName("FMVal");
     var c1val = master.getSheetByName("CampVal");
@@ -120,5 +120,37 @@ function insertVal() {
         var rangeArr = c3val.getRange(i,4,1,6);
         var ruleArr = SpreadsheetApp.newDataValidation().requireValueInRange(rangeArr).build();
         cellArr.setDataValidation(ruleArr);
+    }
+}
+
+function validateAndCorrect(sheetUrl)
+{
+    var master = SpreadsheetApp.openByUrl(sheetUrl);
+    var list = master.getSheetByName("List");
+    var listLastRow = master.getLastRow();
+    var listRange = list.getRange(1, 1, listLastRow, 15);
+    var listValues = listRange.getValues();
+    for(var i=1; i<listLastRow; i++)
+    {
+        var fmDate = new Date((listValues[i][7]).toString());
+        var lmDate = new Date((listValues[i][11]).toString());
+        var fmType = listValues[i][8];
+        //First Meal Date is less than 21 TODO : Shift to 21 and Meal Type Breakfast
+        if(fmDate.getDate() < 21 && fmDate.getDate() > 7)
+        {    
+            list.getRange(i+1,8).setValue("21/05/2020");
+            list.getRange(i+1,9).setValue("Dinner");
+        }
+        //First Meal Date is 21 and Meal Type is not Dinner : Shift Meal Type to Dinner
+        if(fmDate.getDate() == 21 && fmType != "Dinner")
+        {
+            list.getRange(i+1,9).setValue("Dinner");
+        }
+        //Last Meal Date is Beyond 7 June : Shift to 7 June and Meal Type Dinner
+        if(lmDate.getDate() > 7 && lmDate.getDate() < 20)
+        {
+            list.getRange(i+1,12).setValue("7/06/2020");
+            list.getRange(i+1,13).setValue("Dinner")
+        }
     }
 }
